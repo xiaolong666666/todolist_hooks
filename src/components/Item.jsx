@@ -48,4 +48,4 @@ const Item = ({ todo, deleteTodo, changeTodo, editTodo}) => {
     );
 };
 
-export default Item;
+export default React.memo(Item);

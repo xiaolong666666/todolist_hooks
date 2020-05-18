@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useCallback } from 'react';
 import Item from './components/Item'
 import Footer from './components/Footer'
 import './App.css';
@@ -111,9 +111,9 @@ const App = () => {
           { items }
         </ul>
       </section>
-      <Footer todoNum={todoNum} view={view} setView={setView} clearCompleted={clearCompleted}/>
+      <Footer todoNum={todoNum} view={view} setView={useCallback(setView,[])} clearCompleted={useCallback(clearCompleted,[])}/>
     </section>
   );
 };
 
-export default App;
+export default React.memo(App);

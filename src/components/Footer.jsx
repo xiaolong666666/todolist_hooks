@@ -19,4 +19,4 @@ const Footer = ({ todoNum, view, setView, clearCompleted}) => {
     );
 };
 
-export default Footer;
+export default React.memo(Footer);
