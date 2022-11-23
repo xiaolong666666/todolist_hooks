@@ -1,32 +1,32 @@
-import React, { useState, useCallback } from 'react';
+import React, { useState, useCallback, memo } from 'react'
 import Item from './components/Item'
 import Footer from './components/Footer'
-import './App.css';
+import './App.css'
 
 const App = () => {
-
-  let [todoDatas,setTodoDatas] = useState([])
-  let [todoNum,setTodoNum] = useState(0)
-  let [view,setView] = useState("all")
-  let [flag,setFlag] = useState(false)
+  let [todoDatas, setTodoDatas] = useState([])
+  let [todoNum, setTodoNum] = useState(0)
+  let [view, setView] = useState("all")
+  let [flag, setFlag] = useState(false)
 
   // 添加Todo
   let addTodo = e => {
-    if(e.keyCode!==13) return false
-    if(e.target.value.trim()==="") return false
-    let todo = {}
-    todo.id = +new Date()
-    todo.value = e.target.value.trim()
-    todo.hasCompleted = false
-    setTodoDatas([...todoDatas,todo])
-    setTodoNum(todoNum+1)
+    if (e.keyCode !== 13) return false
+    if (e.target.value.trim() === "") return false
+    let todo = {
+      id: +new Date(),
+      value: e.target.value.trim(),
+      hasCompleted: false
+    }
+    setTodoDatas([...todoDatas, todo])
+    setTodoNum(todoNum + 1)
     e.target.value = ""
   }
 
   // 删除Todo
   let deleteTodo = id => {
-    todoDatas = todoDatas.filter(todo=>{
-      if (todo.id === id){
+    todoDatas = todoDatas.filter(todo => {
+      if (todo.id === id) {
         if (!todo.hasCompleted) {
           setTodoNum(todoNum - 1)
         }
@@ -39,14 +39,10 @@ const App = () => {
 
   // 改变Todo状态
   let changeTodo = id => {
-    todoDatas = todoDatas.map(todo=>{
-      if(todo.id===id){
+    todoDatas = todoDatas.map(todo => {
+      if (todo.id === id) {
         todo.hasCompleted = !todo.hasCompleted
-        if(todo.hasCompleted){
-          setTodoNum(todoNum - 1)
-        }else{
-          setTodoNum(todoNum + 1)
-        }
+        setTodoNum(todo.hasCompleted ? todoNum - 1 : todoNum + 1)
       }
       return todo
     })
@@ -55,8 +51,8 @@ const App = () => {
 
   // 修改Todo
   let editTodo = value => {
-    todoDatas = todoDatas.map(todo=>{
-      if(todo.id===value.id){
+    todoDatas = todoDatas.map(todo => {
+      if (todo.id === value.id) {
         todo.value = value.value
       }
       return todo
@@ -66,7 +62,7 @@ const App = () => {
 
   // 删除已完成Todo
   let clearCompleted = () => {
-    todoDatas = todoDatas.filter(todo=>!todo.hasCompleted)
+    todoDatas = todoDatas.filter(todo => !todo.hasCompleted)
     setTodoDatas(todoDatas)
   }
 
@@ -74,18 +70,17 @@ const App = () => {
   let isAll = () => {
     flag = !flag
     setFlag(flag)
-    todoDatas = todoDatas.map(todo=>{
+    todoDatas = todoDatas.map(todo => {
       todo.hasCompleted = flag
       return todo
     })
-    if(flag) setTodoNum(0)
-    if(!flag) setTodoNum(todoDatas.length)
+    setTodoNum(flag ? 0 : todoDatas.length)
     setTodoDatas(todoDatas)
   }
 
   // 过滤Todo
-  let todoDatasFilter = todoDatas.filter(todo=>{
-    switch(view){
+  let todoDatasFilter = todoDatas.filter(todo => {
+    switch (view) {
       case "all": return true
       case "active": return !todo.hasCompleted
       case "completed": return todo.hasCompleted
@@ -94,9 +89,9 @@ const App = () => {
   })
   
   // Todo列表
-  let items = todoDatasFilter.map(todo=>{
-    return <Item key={todo.id} todo={todo} deleteTodo={deleteTodo} changeTodo={changeTodo} editTodo={editTodo}/>
-  })
+  let items = todoDatasFilter.map(todo => (
+    <Item key={todo.id} todo={todo} deleteTodo={deleteTodo} changeTodo={changeTodo} editTodo={editTodo} />
+  ))
   
   return (
     <section className="todoapp">
@@ -111,9 +106,14 @@ const App = () => {
           { items }
         </ul>
       </section>
-      <Footer todoNum={todoNum} view={view} setView={useCallback(setView,[])} clearCompleted={useCallback(clearCompleted,[])}/>
+      <Footer
+        todoNum={todoNum}
+        view={view}
+        setView={useCallback(setView, [])}
+        clearCompleted={useCallback(clearCompleted, [todoDatas])}
+      />
     </section>
   );
 };
 
-export default React.memo(App);
+export default memo(App);
